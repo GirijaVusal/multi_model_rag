@@ -1,0 +1,45 @@
+2.1 Overall architecture
+
+CNNs are comprised of three types of layers. These are convolutional layers, pooling layers and fully-connected layers. When these layers are stacked, a CNN architecture has been formed. A simpliﬁed CNN architecture for MNIST classiﬁcation is illustrated in Figure 2.
+
+convolution w/ReLu _ pooling
+
+fully-connected
+
+f
+
+\fF
+
+\
+
+| f\
+
+9
+
+input
+
+output
+
+fully-connected w/ ReLu
+
+Fig.2: An simple CNN architecture, comprised of just ﬁve layers
+
+The basic functionality of the example CNN above can be broken down into four key areas.
+
+1. As found in other forms of ANN, the input layer will hold the pixel values of the image.
+
+2. The convolutional layer will determine the output of neurons of which are connected to local regions of the input through the calculation of the scalar product between their weights and the region connected to the input vol- ume. The rectiﬁed linear unit (commonly shortened to ReLu) aims to apply
+
+Introduction to Convolutional Neural Networks
+
+an ’elementwise’ activation function such as sigmoid to the output of the activation produced by the previous layer.
+
+3. The pooling layer will then simply perform downsampling along the spa- tial dimensionality of the given input, further reducing the number of pa- rameters within that activation.
+
+4. The fully-connected layers will then perform the same duties found in standard ANNs and attempt to produce class scores from the activations, to be used for classiﬁcation. It is also suggested that ReLu may be used between these layers, as to improve performance.
+
+Through this simple method of transformation, CNNs are able to transform the original input layer by layer using convolutional and downsampling tech- niques to produce class scores for classiﬁcation and regression purposes.
+
+Fig.3: Activations taken from the ﬁrst convolutional layer of a simplistic deep CNN, after training on the MNIST database of handwritten digits. If you look carefully, you can see that the network has successfully picked up on character- istics unique to speciﬁc numeric digits.
+
+However, it is important to note that simply understanding the overall archi- tecture of a CNN architecture will not sufﬁce. The creation and optimisation of these models can take quite some time, and can be quite confusing. We will now explore in detail the individual layers, detailing their hyperparameters and connectivities.

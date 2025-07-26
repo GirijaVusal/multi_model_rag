@@ -1,0 +1,63 @@
+5
+
+2015
+
+1
+
+0
+
+2 c e D 2 ] E N . s c [ 2 v 8 5 4 8 0 . 1 1 5 1 :
+
+v
+
+i
+
+X
+
+r
+
+a
+
+An Introduction to Convolutional Neural Networks
+
+Keiron O’Shea1 and Ryan Nash2
+
+1 Department of Computer Science, Aberystwyth University, Ceredigion, SY23 3DB keo7@aber.ac.uk 2 School of Computing and Communications, Lancaster University, Lancashire, LA1 4YW nashrd@live.lancs.ac.uk
+
+nashrd@live.lancs.ac.uk
+
+Abstract. The ﬁeld of machine learning has taken a dramatic twist in re- cent times, with the rise of the Artiﬁcial Neural Network (ANN). These biologically inspired computational models are able to far exceed the per- formance of previous forms of artiﬁcial intelligence in common machine learning tasks. One of the most impressive forms of ANN architecture is that of the Convolutional Neural Network (CNN). CNNs are primarily used to solve difﬁcult image-driven pattern recognition tasks and with their precise yet simple architecture, offers a simpliﬁed method of getting started with ANNs.
+
+This document provides a brief introduction to CNNs, discussing recently published papers and newly formed techniques in developing these bril- liantly fantastic image recognition models. This introduction assumes you are familiar with the fundamentals of ANNs and machine learning.
+
+Keywords: Pattern recognition, artiﬁcial neural networks, machine learn- ing, image analysis
+
+1 Introduction
+
+Artiﬁcial Neural Networks (ANNs) are computational processing systems of which are heavily inspired by way biological nervous systems (such as the hu- man brain) operate. ANNs are mainly comprised of a high number of intercon- nected computational nodes (referred to as neurons), of which work entwine in a distributed fashion to collectively learn from the input in order to optimise its ﬁnal output.
+
+The basic structure of a ANN can be modelled as shown in Figure 1. We would load the input, usually in the form of a multidimensional vector to the input layer of which will distribute it to the hidden layers. The hidden layers will then make decisions from the previous layer and weigh up how a stochastic change within itself detriments or improves the ﬁnal output, and this is referred to as the process of learning. Having multiple hidden layers stacked upon each-other is commonly called deep learning.
+
+2
+
+Keiron O’Shea et al.
+
+Input Layer Hidden Layer Output Layer Input 2 Output
+
+Fig.1: A simple three layered feedforward neural network (FNN), comprised of a input layer, a hidden layer and an output layer. This structure is the basis of a number of common ANN architectures, included but not limited to Feed- forward Neural Networks (FNN), Restricted Boltzmann Machines (RBMs) and Recurrent Neural Networks (RNNs).
+
+The two key learning paradigms in image processing tasks are supervised and unsupervised learning. Supervised learning is learning through pre-labelled inputs, which act as targets. For each training example there will be a set of input values (vectors) and one or more associated designated output values. The goal of this form of training is to reduce the models overall classiﬁcation error, through correct calculation of the output value of training example by training.
+
+Unsupervised learning differs in that the training set does not include any la- bels. Success is usually determined by whether the network is able to reduce or increase an associated cost function. However, it is important to note that most image-focused pattern-recognition tasks usually depend on classiﬁcation using supervised learning.
+
+Convolutional Neural Networks (CNNs) are analogous to traditional ANNs in that they are comprised of neurons that self-optimise through learning. Each neuron will still receive an input and perform a operation (such as a scalar product followed by a non-linear function) - the basis of countless ANNs. From the input raw image vectors to the ﬁnal output of the class score, the entire of the network will still express a single perceptive score function (the weight). The last layer will contain loss functions associated with the classes, and all of the regular tips and tricks developed for traditional ANNs still apply.
+
+The only notable difference between CNNs and traditional ANNs is that CNNs are primarily used in the ﬁeld of pattern recognition within images. This allows us to encode image-speciﬁc features into the architecture, making the network
+
+Introduction to Convolutional Neural Networks
+
+more suited for image-focused tasks - whilst further reducing the parameters required to set up the model.
+
+One of the largest limitations of traditional forms of ANN is that they tend to struggle with the computational complexity required to compute image data. Common machine learning benchmarking datasets such as the MNIST database of handwritten digits are suitable for most forms of ANN, due to its relatively small image dimensionality of just 28 × 28. With this dataset a single neuron in the ﬁrst hidden layer will contain 784 weights (28×28×1 where 1 bare in mind that MNIST is normalised to just black and white values), which is manageable for most forms of ANN.
+
+If you consider a more substantial coloured image input of 64×64, the number of weights on just a single neuron of the ﬁrst layer increases substantially to 12,288. Also take into account that to deal with this scale of input, the network will also need to be a lot larger than one used to classify colour-normalised MNIST digits, then you will understand the drawbacks of using such models.

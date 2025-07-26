@@ -1,0 +1,63 @@
+2.3 Pooling layer
+
+Pooling layers aim to gradually reduce the dimensionality of the representa- tion, and thus further reduce the number of parameters and the computational complexity of the model.
+
+The pooling layer operates over each activation map in the input, and scales its dimensionality using the “MAX” function. In most CNNs, these come in the form of max-pooling layers with kernels of a dimensionality of 2 × 2 applied with a stride of 2 along the spatial dimensions of the input. This scales the activation map down to 25% of the original size - whilst maintaining the depth volume to its standard size.
+
+Due to the destructive nature of the pooling layer, there are only two generally observed methods of max-pooling. Usually, the stride and ﬁlters of the pooling layers are both set to 2 × 2, which will allow the layer to extend through the entirety of the spatial dimensionality of the input. Furthermore overlapping pooling may be utilised, where the stride is set to 2 with a kernel size set to 3. Due to the destructive nature of pooling, having a kernel size above 3 will usually greatly decrease the performance of the model.
+
+It is also important to understand that beyond max-pooling, CNN architectures may contain general-pooling. General pooling layers are comprised of pooling neurons that are able to perform a multitude of common operations including L1/L2-normalisation, and average pooling. However, this tutorial will primar- ily focus on the use of max-pooling.
+
+2.4 Fully-connected layer
+
+The fully-connected layer contains neurons of which are directly connected to the neurons in the two adjacent layers, without being connected to any layers within them. This is analogous to way that neurons are arranged in traditional forms of ANN. (Figure 1)
+
+3 Recipes
+
+Despite the relatively small number of layers required to form a CNN, there is no set way of formulating a CNN architecture. That being said, it would be idiotic to simply throw a few of layers together and expect it to work. Through reading of related literature it is obvious that much like other forms of ANNs, CNNs tend to follow a common architecture. This common architecture is illus- trated in Figure 2, where convolutional layers are stacked, followed by pooling layers in a repeated manner before feeding forward to fully-connected layers.
+
+Introduction to Convolutional Neural Networks
+
+Another common CNN architecture is to stack two convolutional layers before each pooling layer, as illustrated in Figure 5. This is strongly recommended as stacking multiple convolutional layers allows for more complex features of the input vector to be selected.
+
+convolution w/ReLu pooling hy
+
+convolution w/ReLu pooling
+
+h
+
+pooling | CY
+
+fully-connected
+
+a)
+
+O
+
+input
+
+LJ
+
+—T7 convolution fully-connected w/ ReLu w/ ReLu
+
+Fig.5: A common form of CNN architecture in which convolutional layers are stacked between ReLus continuously before being passed through the pooling layer, before going between one or many fully connected ReLus.
+
+It is also advised to split large convolutional layers up into many smaller sized convolutional layers. This is to reduce the amount of computational complexity within a given convolutional layer. For example, if you were to stack three con- volutional layers on top of each other with a receptive ﬁeld of 3×3. Each neuron of the ﬁrst convolutional layer will have a 3×3 view of the input vector. A neu- ron on the second convolutional layer will then have a 5 × 5 view of the input vector. A neuron on the third convolutional layer will then have a 7×7 view of the input vector. As these stacks feature non-linearities which in turn allows us to express stronger features of the input with fewer parameters. However, it is important to understand that this does come with a distinct memory allocation problem - especially when making use of the backpropagation algorithm.
+
+The input layer should be recursively divisible by two. Common numbers in- clude 32 × 32, 64 × 64, 96 × 96, 128 × 128 and 224 × 224.
+
+Whilst using small ﬁlters, set stride to one and make use of zero-padding as to ensure that the convolutional layers do not reconﬁgure any of the dimension- ality of the input. The amount of zero-padding to be used should be calculated by taking one away from the receptive ﬁeld size and dividing by two.activation
+
+CNNs are extremely powerful machine learning algorithms, however they can be horrendously resource-heavy. An example of this problem could be in ﬁlter- ing a large image (anything over 128 × 128 could be considered large), so if the input is 227 × 227 (as seen with ImageNet) and we’re ﬁltering with 64 kernels each with a zero padding of then the result will be three activation vectors of size 227 × 227 × 64 - which calculates to roughly 10 million activations - or an enormous 70 megabytes of memory per image. In this case you have two op- tions. Firstly, you can reduce the spatial dimensionality of the input images by
+
+0)
+
+°
+
+output
+
+10 Keiron O’Shea et al.
+
+resizing the raw images to something a little less heavy. Alternatively, you can go against everything we stated earlier in this document and opt for larger ﬁlter sizes with a larger stride (2, as opposed to 1).
+
+In addition to the few rules-of-thumb outlined above, it is also important to ac- knowledge a few ’tricks’ about generalised ANN training techniques. The au- thors suggest a read of Geoffrey Hinton’s excellent “Practical Guide to Training Restricted Boltzmann Machines”.
