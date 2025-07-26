@@ -35,19 +35,19 @@ class ChatBotView(APIView):
 
 class CreateEmbeddingView(APIView):
     def post(self, request):
-        document = request.data.get("document")
-
-        file_url = (request.data.get("document"),)
-        images_background_context = (request.get("images_background_context"),)
-        collection_name = (request.data.get("collection_name"),)
+        file_url = request.data.get("file_url")
+        print("=================")
+        print(file_url)
+        images_background_context = request.data.get("images_background_context")
+        collection_name = request.data.get("collection_name")
 
         # filename: str = "downloaded.pdf", need to parse from file_url
-        output_dir: str = ("./input_files",)
-        persist_directory: str = ("./chroma_db",)
-        docstore_path: str = ("./docstore",)
-        id_key: str = ("doc_id",)
+        # output_dir: str = ("./input_files",)
+        # persist_directory: str = ("./chroma_db",)
+        # docstore_path: str = ("./docstore",)
+        # id_key: str = ("doc_id",)
 
-        if not document:
+        if not file_url:
             return Response(
                 {"error": "No Document provided."}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -65,13 +65,14 @@ class CreateEmbeddingView(APIView):
 
         # TODO: Call your LLM here
         response = self.create_emdedding(
-            document, collection_name, images_background_context
+            file_url, collection_name, images_background_context
         )
 
         return Response({"Response": response}, status=status.HTTP_200_OK)
 
     def create_emdedding(self, document, collection_name, images_background_context):
         response = store_embedding(document, collection_name, images_background_context)
+        # response = True
         if response:
             return f"Vector db is creeted with collection name  {collection_name}. You need to use this when chatting with your document"
         else:

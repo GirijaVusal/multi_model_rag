@@ -8,14 +8,16 @@ from base64 import b64decode
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+import os
+import pickle
 
 
 def store_embedding(
     file_url: str,
+    collection_name: str = "multi_modal_rag",
     images_background_context: str = " ",
     output_dir: str = "./input_files",
     filename: str = "downloaded.pdf",
-    collection_name: str = "multi_modal_rag",
     persist_directory: str = "./chroma_db",
     docstore_path: str = "./docstore",
     id_key: str = "doc_id",
@@ -28,6 +30,18 @@ def store_embedding(
         )
         text_summaries, table_summaries = generate_table_text_summary(texts, tables)
         image_summaries = generate_images_summary(images, images_background_context)
+
+        output_dir = "pdf_pickle_output"
+        os.makedirs(output_dir, exist_ok=True)
+        output_pickle_path = os.path.join(output_dir, "summary.pkl")
+        with open(output_pickle_path, "wb") as f:
+            pickle.dump(
+                {
+                    "table_summaries": table_summaries,
+                    "image_summaries": image_summaries,
+                },
+                f,
+            )
 
         upsert(
             retriever,

@@ -1,0 +1,41 @@
+Multi-Scale Anchors as Regression References
+
+Our design of anchors presents a novel scheme for addressing multiple scales (and aspect ratios). As shown in Figure 1, there have been two popular ways for multi-scale predictions. The ﬁrst way is based on image/feature pyramids, e.g., in DPM [8] and CNN- based methods [9], [1], [2]. The images are resized at multiple scales, and feature maps (HOG [8] or deep convolutional features [9], [1], [2]) are computed for each scale (Figure 1(a)). This way is often useful but is time-consuming. The second way is to use sliding windows of multiple scales (and/or aspect ratios) on the feature maps. For example, in DPM [8], models of different aspect ratios are trained separately using different ﬁlter sizes (such as 5×7 and 7×5). If this way is used to address multiple scales, it can be thought of as a “pyramid of ﬁlters” (Figure 1(b)). The second way is usually adopted jointly with the ﬁrst way [8].
+
+As a comparison, our anchor-based method is built on a pyramid of anchors, which is more cost-efﬁcient. Our method classiﬁes and regresses bounding boxes with reference to anchor boxes of multiple scales and aspect ratios. It only relies on images and feature maps of a single scale, and uses ﬁlters (sliding win- dows on the feature map) of a single size. We show by experiments the effects of this scheme for addressing multiple scales and sizes (Table 8).
+
+Because of this multi-scale design based on anchors, we can simply use the convolutional features com- puted on a single-scale image, as is also done by the Fast R-CNN detector [2]. The design of multi- scale anchors is a key component for sharing features without extra cost for addressing scales.
+
+3.1.2 Loss Function
+
+5. As is the case of FCNs [7], our network is translation invariant up to the network’s total stride.
+
+6. Considering the feature projection layers, our proposal layers’ parameter count is 3 × 3 × 512 × 512 + 512 × 6 × 9 = 2.4 × 106; MultiBox’s proposal layers’ parameter count is 7 × 7 × (64 + 96 + 64 + 64) × 1536 + 1536 × 5 × 800 = 27 × 106.
+
+For training RPNs, we assign a binary class label (of being an object or not) to each anchor. We as- sign a positive label to two kinds of anchors: (i) the anchor/anchors with the highest Intersection-over- Union (IoU) overlap with a ground-truth box, or (ii) an anchor that has an IoU overlap higher than 0.7 with
+
+4
+
+any ground-truth box. Note that a single ground-truth box may assign positive labels to multiple anchors. Usually the second condition is sufﬁcient to determine the positive samples; but we still adopt the ﬁrst condition for the reason that in some rare cases the second condition may ﬁnd no positive sample. We assign a negative label to a non-positive anchor if its IoU ratio is lower than 0.3 for all ground-truth boxes. Anchors that are neither positive nor negative do not contribute to the training objective.
+
+With these deﬁnitions, we minimize an objective function following the multi-task loss in Fast R-CNN [2]. Our loss function for an image is deﬁned as:
+
+L((pi}s{63}) = 5 Yo Lawl) Le +AS— Di Lreg(tisti)- reg S
+
+Here, i is the index of an anchor in a mini-batch and pi is the predicted probability of anchor i being an object. The ground-truth label p∗ i is 1 if the anchor is positive, and is 0 if the anchor is negative. ti is a vector representing the 4 parameterized coordinates of the predicted bounding box, and t∗ i is that of the ground-truth box associated with a positive anchor. The classiﬁcation loss Lcls is log loss over two classes (object vs. not object). For the regression loss, we use Lreg(ti,t∗ i) = R(ti − t∗ i) where R is the robust loss function (smooth L1) deﬁned in [2]. The term p∗ iLreg means the regression loss is activated only for positive anchors (p∗ i = 1) and is disabled otherwise (p∗ i = 0). The outputs of the cls and reg layers consist of {pi} and {ti} respectively.
+
+The two terms are normalized by Ncls and Nreg and weighted by a balancing parameter λ. In our current implementation (as in the released code), the cls term in Eqn.(1) is normalized by the mini-batch size (i.e., Ncls = 256) and the reg term is normalized by the number of anchor locations (i.e., Nreg ∼ 2,400). By default we set λ = 10, and thus both cls and reg terms are roughly equally weighted. We show by experiments that the results are insensitive to the values of λ in a wide range (Table 9). We also note that the normalization as above is not required and could be simpliﬁed.
+
+For bounding box regression, we adopt the param- eterizations of the 4 coordinates following [5]:
+
+tx = (x − xa)/wa, ty = (y − ya)/ha, tw = log(w/wa), t∗ x = (x∗ − xa)/wa, th = log(h/ha), t∗ y = (y∗ − ya)/ha, t∗ w = log(w∗/wa), t∗ h = log(h∗/ha),
+
+where x, y, w, and h denote the box’s center coordi- nates and its width and height. Variables x, xa, and x∗ are for the predicted box, anchor box, and ground- truth box respectively (likewise for y,w,h). This can
+
+(1)
+
+(2)
+
+be thought of as bounding-box regression from an anchor box to a nearby ground-truth box.
+
+Nevertheless, our method achieves bounding-box regression by a different manner from previous RoI- based (Region of Interest) methods [1], [2]. In [1], [2], bounding-box regression is performed on features pooled from arbitrarily sized RoIs, and the regression weights are shared by all region sizes. In our formula- tion, the features used for regression are of the same spatial size (3 × 3) on the feature maps. To account for varying sizes, a set of k bounding-box regressors are learned. Each regressor is responsible for one scale and one aspect ratio, and the k regressors do not share weights. As such, it is still possible to predict boxes of various sizes even though the features are of a ﬁxed size/scale, thanks to the design of anchors.
