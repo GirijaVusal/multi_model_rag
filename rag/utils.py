@@ -1,6 +1,6 @@
 import os
 import requests
-from unstructured.partition.pdf import partition_pdf
+# from unstructured.partition.pdf import partition_pdf
 from langchain.document_loaders import UnstructuredFileLoader
 
 

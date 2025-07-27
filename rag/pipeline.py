@@ -10,7 +10,11 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
 import pickle
-
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    temperature=0.0,
+    max_tokens=512,
+    api_key=os.getenv("GROQ_API_KEY"))
 
 def store_embedding(
     file_url: str,
@@ -57,6 +61,19 @@ def store_embedding(
         return True
     return False
 
+def parse_docs(docs):
+    """Split base64-encoded images and texts"""
+    b64 = []
+    text = []
+    for doc in docs:
+        try:
+            b64decode(doc)
+            b64.append(doc)
+        except Exception as e:
+            text.append(doc)
+    # print()
+    # return {"images": b64, "texts": text}
+    return {"texts": text}
 
 def inference(
     query: str,
@@ -70,24 +87,16 @@ def inference(
         collection_name, persist_directory, docstore_path, id_key
     )
     # Retrieve
-    docs = retriever.invoke("who are the authors of the paper?")
+    docs = retriever.invoke(query)
+    docs = parse_docs(docs)
     return docs
 
 
-def parse_docs(docs):
-    """Split base64-encoded images and texts"""
-    b64 = []
-    text = []
-    for doc in docs:
-        try:
-            b64decode(doc)
-            b64.append(doc)
-        except Exception as e:
-            text.append(doc)
-    return {"images": b64, "texts": text}
 
 
-def build_prompt(kwargs):
+
+
+def build_prompt(**kwargs):
 
     docs_by_type = kwargs["context"]
     user_question = kwargs["question"]
@@ -129,34 +138,101 @@ def rag(
     docstore_path: str = "./docstore",
     id_key: str = "doc_id",
 ):
+    out = inference(
+        query,
+        collection_name,
+        persist_directory,
+        docstore_path,
+        id_key,)
+    
+    prompt_template = f"""
+    Answer the question based only on the following context, which can include text, tables, and the below image.
+    Context: {out}
+    User Question: {query}
+    """
 
-    retriever = get_vdb_retriever(
-        collection_name, persist_directory, docstore_path, id_key
+    out = llm.invoke(prompt_template)
+    
+    print("=====================================")
+    print(out)
+       # retriever = get_vdb_retriever(
+    #     collection_name, persist_directory, docstore_path, id_key
+    # )
+
+    # chain = (
+    #     {
+    #         "context": retriever | RunnableLambda(parse_docs),
+    #         "question": RunnablePassthrough(),
+    #     }
+    #     | RunnableLambda(build_prompt)
+    #     | llm
+    #     | StrOutputParser()
+    # )
+
+    # chain_with_sources = {
+    #     "context": retriever | RunnableLambda(parse_docs),
+    #     "question": RunnablePassthrough(),
+    # } | RunnablePassthrough().assign(
+    #     response=(
+    #         RunnableLambda(build_prompt)
+    #         | ChatOpenAI(model="gpt-4o-mini")
+    #         | StrOutputParser()
+    #     )
+    # )
+
+    # response = chain.invoke(query)
+
+    # print(response)
+
+    return out.content
+
+
+if __name__ =="__main__":
+    query = "What is pooling layer"
+    collection_name = "rcnn"
+    persist_directory = "./chroma_db"
+    docstore_path = "./docstore"
+    id_key = "doc_id"
+
+    # out = inference(
+    #     query,
+    #     collection_name,
+    #     persist_directory,
+    #     docstore_path,
+    #     id_key,
+    # )
+
+    '''
+    
+    out = rag(
+        query,
+        collection_name,
+        persist_directory,
+        docstore_path,
+        id_key,
     )
+    
+    print("=====================Retrieved documents:====================")
+    print(len(out))
 
-    chain = (
-        {
-            "context": retriever | RunnableLambda(parse_docs),
-            "question": RunnablePassthrough(),
-        }
-        | RunnableLambda(build_prompt)
-        | ChatOpenAI(model="gpt-4o-mini")
-        | StrOutputParser()
-    )
+    print(parse_docs(out))'''
+    print("=====================================")
+    # print(llm.invoke("how are you doing?"))
+    from langchain_groq import ChatGroq
 
-    chain_with_sources = {
-        "context": retriever | RunnableLambda(parse_docs),
-        "question": RunnablePassthrough(),
-    } | RunnablePassthrough().assign(
-        response=(
-            RunnableLambda(build_prompt)
-            | ChatOpenAI(model="gpt-4o-mini")
-            | StrOutputParser()
-        )
-    )
-
-    response = chain.invoke(query)
-
-    print(response)
-
-    return response
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=os.getenv("GROQ_API_KEY"))
+    messages = [
+    (
+        "system",
+        "You are a helpful assistant.",
+    ),
+    ("human", "Can you tell me about pooling layers in CNNs?"),
+]
+    ai_msg = llm.invoke(messages)
+    print(ai_msg)

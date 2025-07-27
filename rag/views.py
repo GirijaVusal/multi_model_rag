@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .pipeline import store_embedding
+from .pipeline import store_embedding,rag
 
 
 class ChatBotView(APIView):
@@ -23,14 +23,14 @@ class ChatBotView(APIView):
         # prompt
 
         # TODO: Call your LLM here
-        bot_response = self.call_llm(user_message)
+        bot_response = self.call_llm(user_message,collection_name)
 
         return Response({"user": user_message, "bot": bot_response})
 
-    def call_llm(self, message):
+    def call_llm(self, message,collection_name):
         # Replace this with your LLM call (e.g., OpenAI API, local model, etc.)
         # For now, let's simulate a response
-        return f"You said: {message}"
+        return rag(message,collection_name)
 
 
 class CreateEmbeddingView(APIView):

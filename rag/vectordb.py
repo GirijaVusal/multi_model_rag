@@ -108,26 +108,7 @@ def upsert(
         retriever.docstore.mset(list(zip(clean_ids, byte_texts)))
         print("Text upserted")
 
-    # if texts:
-    #     doc_ids = [str(uuid.uuid4()) for _ in texts]
-    #     summary_texts = [
-    #         Document(page_content=summary, metadata={id_key: doc_ids[i]})
-    #         for i, summary in enumerate(text_summaries)
-    #     ]
-    #     retriever.vectorstore.add_documents(summary_texts)
-    #     retriever.docstore.mset(list(zip(doc_ids, [t.encode("utf-8") for t in texts])))
-    #     print("Text upserted")
 
-    # # Add tables
-    # if tables:
-    #     table_ids = [str(uuid.uuid4()) for _ in tables]
-    #     summary_tables = [
-    #         Document(page_content=summary, metadata={id_key: table_ids[i]})
-    #         for i, summary in enumerate(table_summaries)
-    #     ]
-    #     retriever.vectorstore.add_documents(summary_tables)
-    #     retriever.docstore.mset(list(zip(table_ids, tables)))
-    #     print("Table upserted")
 
     if tables and table_summaries:
         doc_ids = [str(uuid.uuid4()) for _ in texts]
@@ -167,62 +148,7 @@ def upsert(
         retriever.docstore.mset(list(zip(img_ids, image_bytes)))
 
         print("Images Upserted.")
-
-    # if images:
-    # img_ids = [str(uuid.uuid4()) for _ in images]
-    # summary_img = [
-    #     Document(page_content=summary, metadata={id_key: img_ids[i]})
-    #     for i, summary in enumerate(image_summaries)
-    # ]
-    # retriever.vectorstore.add_documents(summary_img)
-
-    # # Convert base64 strings to bytes
-    # image_bytes = [base64.b64decode(img_str) for img_str in images]
-    # retriever.docstore.mset(list(zip(img_ids, image_bytes)))
-
     return True
 
 
-# def upsert(
-#     retriever: MultiVectorRetriever,
-#     texts: list = None,
-#     text_summaries: list = None,
-#     tables: list = None,
-#     table_summaries: list = None,
-#     images: list = None,
-#     image_summaries: list = None,
-#     id_key: str = "doc_id",
-# ) -> bool:
-#     # Add texts
-#     if texts:
-#         doc_ids = [str(uuid.uuid4()) for _ in texts]
-#         summary_texts = [
-#             Document(page_content=summary, metadata={id_key: doc_ids[i]})
-#             for i, summary in enumerate(text_summaries)
-#         ]
-#         retriever.vectorstore.add_documents(summary_texts)
-#         retriever.docstore.mset(list(zip(doc_ids, [t.encode("utf-8") for t in texts])))
-#         print("Text upserted")
 
-#     # Add tables
-#     if tables:
-#         table_ids = [str(uuid.uuid4()) for _ in tables]
-#         summary_tables = [
-#             Document(page_content=summary, metadata={id_key: table_ids[i]})
-#             for i, summary in enumerate(table_summaries)
-#         ]
-#         retriever.vectorstore.add_documents(summary_tables)
-#         retriever.docstore.mset(list(zip(table_ids, tables)))
-#         print("Table upserted")
-
-#     # Add image summaries
-#     if images:
-#         img_ids = [str(uuid.uuid4()) for _ in images]
-#         summary_img = [
-#             Document(page_content=summary, metadata={id_key: img_ids[i]})
-#             for i, summary in enumerate(image_summaries)
-#         ]
-#         retriever.vectorstore.add_documents(summary_img)
-#         retriever.docstore.mset(list(zip(img_ids, images)))
-#         print("Images Upserted.")
-#     return True
