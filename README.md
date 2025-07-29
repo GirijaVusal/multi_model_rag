@@ -18,7 +18,7 @@ You can find Demo videos in assets file.
 # System Diagram
 
 
-                                 ┌──────────────────────────────┐
+                         ┌──────────────────────────────┐
                          │   Input: PDF URL             │
                          └────────────┬─────────────────┘
                                       │
